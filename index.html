@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#ff8f2c" />
+    <title>Shaker Escape Room</title>
+    <link rel="icon" href="assets/logo.png" />
+    <link rel="stylesheet" href="https://use.typekit.net/zxq3ote.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="main.js" defer></script>
+  </head>
+
+  <body>
+    <main class="app">
+      <section id="start-screen" class="screen screen--start" aria-labelledby="start-title">
+        <img src="assets/logo.png" alt="Watt About" class="logo" />
+        <h1 id="start-title">Scuoti per ricaricare<br />la tua energia</h1>
+        <div class="actions">
+          <button id="recharge-button" class="btn" type="button">RICARICA</button>
+          <p id="permission-message" class="status-message" role="alert" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="game-screen" class="screen screen--game" aria-labelledby="game-title" hidden>
+        <img src="assets/logo.png" alt="Watt About" class="logo logo--small" />
+        <h1 id="game-title" class="visually-hidden">Ricarica la batteria</h1>
+
+        <div class="battery-wrap" aria-hidden="true">
+          <div class="battery-terminal"></div>
+          <div id="battery" class="battery"></div>
+        </div>
+
+        <div class="energy-readout" aria-live="polite" aria-atomic="true">
+          <strong id="joule-value">0</strong><span>/200 joule</span>
+        </div>
+        <p class="shake-hint">Continua a scuotere!</p>
+        <button id="test-shake-button" class="test-control" type="button">
+          Simula uno scossone
+        </button>
+      </section>
+
+      <section id="end-screen" class="screen screen--end" aria-labelledby="end-title" hidden>
+        <img src="assets/logo.png" alt="Watt About" class="logo logo--small" />
+        <div class="result-card">
+          <p class="eyebrow">Batteria carica!</p>
+          <h1 id="end-title">Hai generato<br /><strong>200 joule</strong></h1>
+          <img src="assets/lampada.png" alt="Lampadina" class="appliance" />
+          <p class="result-copy">
+            Abbastanza per accendere una lampadina LED da 10 W per 20 secondi.
+          </p>
+          <div class="code-block">
+            <span>Il codice è</span>
+            <strong>£N3R6Y</strong>
+          </div>
+        </div>
+        <button id="restart-button" class="btn btn--secondary" type="button">RICOMINCIA</button>
+      </section>
+    </main>
+  </body>
+</html>
