@@ -1,8 +1,13 @@
 const MAX_ENERGY = 200;
 const LEVEL_COUNT = 15;
-const SHAKE_COOLDOWN_MS = 90;
-const ACCELERATION_THRESHOLD = 5.5;
-const GRAVITY_DELTA_THRESHOLD = 8;
+// Stessa taratura del progetto shake originale:
+// p5 raddoppia l'accelerazione, deviceMoved usa una soglia di 0,5 per asse,
+// e 30.000 unità di movimento vengono mappate su 350 joule.
+const MOTION_SCALE = 2;
+const MOVE_THRESHOLD = 0.5;
+const MOVEMENT_RANGE = 30000;
+const ENERGY_RANGE = 350;
+const SAMPLE_EVERY_FRAMES = 4;
 
 const startScreen = document.querySelector("#start-screen");
 const gameScreen = document.querySelector("#game-screen");
@@ -16,9 +21,12 @@ const jouleValue = document.querySelector("#joule-value");
 
 let energy = 0;
 let playing = false;
-let lastShakeAt = 0;
-let lastGravitySample = null;
 let lastHapticStep = 0;
+let previousAcceleration = { x: 0, y: 0, z: 0 };
+let shakeStrength = 0;
+let totalMovement = 0;
+let sampleFrame = 0;
+let animationFrameId = null;
 
 function createBatteryLevels() {
   const fragment = document.createDocumentFragment();
@@ -64,48 +72,42 @@ function addEnergy(amount) {
   if (energy >= MAX_ENERGY) finishGame();
 }
 
-function vectorMagnitude(vector) {
-  if (!vector) return 0;
-  return Math.hypot(vector.x || 0, vector.y || 0, vector.z || 0);
-}
-
-function gravityDelta(current) {
-  if (!current) return 0;
-
-  const sample = {
-    x: current.x || 0,
-    y: current.y || 0,
-    z: current.z || 0,
-  };
-  const delta = lastGravitySample
-    ? Math.hypot(
-        sample.x - lastGravitySample.x,
-        sample.y - lastGravitySample.y,
-        sample.z - lastGravitySample.z,
-      )
-    : 0;
-
-  lastGravitySample = sample;
-  return delta;
-}
-
 function handleMotion(event) {
+  if (!playing || !event.acceleration) return;
+
+  const currentAcceleration = {
+    x: (event.acceleration.x || 0) * MOTION_SCALE,
+    y: (event.acceleration.y || 0) * MOTION_SCALE,
+    z: (event.acceleration.z || 0) * MOTION_SCALE,
+  };
+  const hasMoved = ["x", "y", "z"].some(
+    (axis) =>
+      Math.abs(currentAcceleration[axis] - previousAcceleration[axis]) > MOVE_THRESHOLD,
+  );
+
+  previousAcceleration = currentAcceleration;
+  if (hasMoved) {
+    shakeStrength = Math.hypot(
+      currentAcceleration.x,
+      currentAcceleration.y,
+      currentAcceleration.z,
+    );
+  }
+}
+
+function sampleMovement() {
   if (!playing) return;
 
-  const now = performance.now();
-  if (now - lastShakeAt < SHAKE_COOLDOWN_MS) return;
+  sampleFrame += 1;
+  if (sampleFrame % SAMPLE_EVERY_FRAMES === 0) {
+    totalMovement += shakeStrength;
+    shakeStrength = 0;
+    const calibratedEnergy = Math.round((totalMovement / MOVEMENT_RANGE) * ENERGY_RANGE);
 
-  const directAcceleration = vectorMagnitude(event.acceleration);
-  const fallbackDelta = gravityDelta(event.accelerationIncludingGravity);
-  const usesDirectAcceleration = directAcceleration > 0;
-  const force = usesDirectAcceleration ? directAcceleration : fallbackDelta;
-  const threshold = usesDirectAcceleration ? ACCELERATION_THRESHOLD : GRAVITY_DELTA_THRESHOLD;
+    if (calibratedEnergy > energy) addEnergy(calibratedEnergy - energy);
+  }
 
-  if (force < threshold) return;
-
-  lastShakeAt = now;
-  const intensity = Math.min(1, (force - threshold) / 12);
-  addEnergy(2.2 + intensity * 2.8);
+  if (playing) animationFrameId = requestAnimationFrame(sampleMovement);
 }
 
 async function requestMotionPermission() {
@@ -135,17 +137,21 @@ async function startGame() {
 
   energy = 0;
   playing = true;
-  lastShakeAt = 0;
-  lastGravitySample = null;
   lastHapticStep = 0;
+  previousAcceleration = { x: 0, y: 0, z: 0 };
+  shakeStrength = 0;
+  totalMovement = 0;
+  sampleFrame = 0;
   renderEnergy();
   showScreen(gameScreen);
   window.addEventListener("devicemotion", handleMotion, { passive: true });
+  animationFrameId = requestAnimationFrame(sampleMovement);
 }
 
 function finishGame() {
   playing = false;
   window.removeEventListener("devicemotion", handleMotion);
+  cancelAnimationFrame(animationFrameId);
   energy = MAX_ENERGY;
   renderEnergy();
 
@@ -156,6 +162,7 @@ function finishGame() {
 function restartGame() {
   playing = false;
   window.removeEventListener("devicemotion", handleMotion);
+  cancelAnimationFrame(animationFrameId);
   permissionMessage.textContent = "";
   showScreen(startScreen);
 }

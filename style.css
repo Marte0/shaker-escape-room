@@ -71,6 +71,14 @@ h1 {
   text-transform: uppercase;
 }
 
+.start-copy {
+  max-width: 430px;
+  font-family: cubano, satoshi, Arial, sans-serif;
+  font-size: clamp(1.35rem, 6vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
 .actions {
   display: grid;
   justify-items: center;
@@ -102,12 +110,6 @@ h1 {
 .test-control:focus-visible {
   outline: 4px solid #4d0a0a;
   outline-offset: 4px;
-}
-
-.btn--secondary {
-  min-width: 0;
-  padding-inline: 22px;
-  font-size: 1rem;
 }
 
 .status-message {
@@ -217,7 +219,7 @@ h1 {
 }
 
 .eyebrow {
-  margin: 0 0 6px;
+  margin: 0 0 24px;
   font-family: cubano, satoshi, Arial, sans-serif;
   font-size: 1.15rem;
   letter-spacing: 0.06em;
@@ -256,7 +258,7 @@ h1 {
 }
 
 .code-block span {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
 }
 
@@ -300,6 +302,10 @@ h1 {
 
   .code-block {
     margin-top: 10px;
+  }
+
+  .eyebrow {
+    margin-bottom: 14px;
   }
 }
 
