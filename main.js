@@ -1,5 +1,7 @@
 const MAX_ENERGY = 200;
-const LEVEL_COUNT = 15;
+const LEVEL_COUNT = 16;
+const ENERGY_PER_COLOR = 50;
+const BATTERY_COLORS = ["is-yellow", "is-green", "is-blue", "is-pink"];
 // Stessa taratura del progetto shake originale:
 // p5 raddoppia l'accelerazione, deviceMoved usa una soglia di 0,5 per asse,
 // e 30.000 unità di movimento vengono mappate su 350 joule.
@@ -48,12 +50,22 @@ function showScreen(screen) {
 
 function renderEnergy() {
   const displayedEnergy = Math.min(MAX_ENERGY, Math.round(energy));
-  const chargedLevels = Math.ceil((displayedEnergy / MAX_ENERGY) * LEVEL_COUNT);
+  const completedColors = Math.floor(displayedEnergy / ENERGY_PER_COLOR);
+  const isFull = displayedEnergy === MAX_ENERGY;
+  const baseColorIndex = completedColors - 1;
+  const nextColorIndex = Math.min(completedColors, BATTERY_COLORS.length - 1);
+  const energyInCurrentColor = isFull
+    ? ENERGY_PER_COLOR
+    : displayedEnergy % ENERGY_PER_COLOR;
+  const transitioningLevels = Math.ceil(
+    (energyInCurrentColor / ENERGY_PER_COLOR) * LEVEL_COUNT,
+  );
 
   jouleValue.textContent = displayedEnergy;
   battery.querySelectorAll(".battery__level").forEach((level, index) => {
-    level.classList.toggle("is-charged", index < chargedLevels);
-    level.classList.toggle("is-high", index < chargedLevels && displayedEnergy >= 120);
+    level.className = "battery__level";
+    const colorIndex = index < transitioningLevels ? nextColorIndex : baseColorIndex;
+    if (colorIndex >= 0) level.classList.add(BATTERY_COLORS[colorIndex]);
   });
 }
 
@@ -168,7 +180,7 @@ function restartGame() {
 }
 
 function simulateShake() {
-  addEnergy(10);
+  addEnergy(5);
 }
 
 rechargeButton.addEventListener("click", startGame);

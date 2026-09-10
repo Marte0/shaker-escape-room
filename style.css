@@ -161,13 +161,24 @@ h1 {
   transition: background-color 160ms ease, transform 160ms ease;
 }
 
-.battery__level.is-charged {
+.battery__level.is-yellow {
   background: #ffd700;
   transform: scaleX(1.01);
 }
 
-.battery__level.is-high {
+.battery__level.is-green {
   background: #b9da49;
+  transform: scaleX(1.01);
+}
+
+.battery__level.is-blue {
+  background: #95d9e5;
+  transform: scaleX(1.01);
+}
+
+.battery__level.is-pink {
+  background: #ffb3d2;
+  transform: scaleX(1.01);
 }
 
 .energy-readout {
