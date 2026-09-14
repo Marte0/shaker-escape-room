@@ -13,10 +13,19 @@
 
   <body>
     <main class="app">
-      <section id="start-screen" class="screen screen--start" aria-labelledby="start-title">
+      <section id="desktop-screen" class="screen screen--desktop" aria-labelledby="desktop-title" hidden>
+        <img src="assets/logo.png" alt="Watt About" class="logo" />
+        <div class="desktop-copy">
+          <h1 id="desktop-title">Per ricaricare l’energia devi scuotere il dispositivo.</h1>
+          <p>Difficile scuotere il computer, non credi?</p>
+          <p class="desktop-instruction">Apri questa pagina sul telefono e preparati a scuotere!</p>
+        </div>
+      </section>
+      <section id="start-screen" class="screen screen--start" aria-labelledby="start-title" hidden>
         <img src="assets/logo.png" alt="Watt About" class="logo" />
         <h1 id="start-title" class="start-copy">
-          Scuoti il telefono per generare la tua energia
+          Hai 20 secondi per produrre l’energia che ti servirà per completare l’avventura.
+          <span class="start-copy__action">Scuoti il telefono per generare energia!</span>
         </h1>
         <div class="actions">
           <button id="recharge-button" class="btn" type="button">RICARICA</button>
@@ -25,8 +34,13 @@
       </section>
 
       <section id="game-screen" class="screen screen--game" aria-labelledby="game-title" hidden>
-        <img src="assets/logo.png" alt="Watt About" class="logo logo--small" />
+        <div id="game-timer" class="game-timer" role="timer" aria-label="Tempo rimanente">20s</div>
         <h1 id="game-title" class="visually-hidden">Ricarica la batteria</h1>
+
+        <div class="game-feedback" aria-live="polite" aria-atomic="true">
+          <p id="shake-prompt" class="shake-prompt">Scuoti</p>
+          <img id="game-appliance" class="game-appliance" alt="" hidden />
+        </div>
 
         <div class="battery-wrap" aria-hidden="true">
           <div class="battery-terminal"></div>
@@ -34,27 +48,19 @@
         </div>
 
         <div class="energy-readout" aria-live="polite" aria-atomic="true">
-          <strong id="joule-value">0</strong><span>/200 joule</span>
+          <strong id="joule-value">0</strong><span> joule</span>
         </div>
-        <p class="shake-hint">Continua a scuotere!</p>
-        <button id="test-shake-button" class="test-control" type="button">
-          Simula uno scossone
-        </button>
       </section>
 
       <section id="end-screen" class="screen screen--end" aria-labelledby="end-title" hidden>
         <img src="assets/logo.png" alt="Watt About" class="logo logo--small" />
         <div class="result-card">
-          <p class="eyebrow">Batteria carica!</p>
-          <h1 id="end-title">Hai generato<br /><strong>200 joule</strong></h1>
-          <img src="assets/lampada.png" alt="Lampadina" class="appliance" />
-          <p class="result-copy">
-            Sono abbastanza per accendere solo una lampadina LED per 20 secondi,
-            ma per ora ce la faremo bastare.
-          </p>
-          <div class="code-block">
+          <h1 id="end-title">Hai generato<br /><strong id="result-energy">0 joule</strong></h1>
+          <img id="result-appliance" src="assets/lampada.png" alt="Lampada" class="appliance" />
+          <p id="result-copy" class="result-copy"></p>
+          <div id="result-code-block" class="code-block" hidden>
             <span>Riscatta la tua energia</span>
-            <strong>£N3R6Y</strong>
+            <strong id="result-code"></strong>
           </div>
         </div>
         <button id="restart-button" class="btn" type="button">RICOMINCIA</button>
